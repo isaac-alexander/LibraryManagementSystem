@@ -1,4 +1,11 @@
 package com.alexander.librarymanagementsystem.repository;
 
-public interface UserRepository {
+import com.alexander.librarymanagementsystem.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    // find user by username
+    User findByUsername(String username);
+
 }
