@@ -20,6 +20,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
 
+                        .requestMatchers("/register").hasRole("ADMIN")
+
                         // ADMIN ONLY
                         .requestMatchers("/books/new", "/books/*/edit", "/books/*/delete").hasRole("ADMIN")
 
@@ -31,12 +33,14 @@ public class SecurityConfig {
                 )
 
                 .formLogin(login -> login
-                        .loginPage("/login")   // custom login page
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/books", true)
+                        .failureUrl("/login")
                         .permitAll()
                 )
 
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/login")
                         .permitAll()
                 );
 

@@ -2,11 +2,14 @@ package com.alexander.librarymanagementsystem.controller;
 
 import com.alexander.librarymanagementsystem.entity.Book;
 import com.alexander.librarymanagementsystem.service.BookService;
+import com.alexander.librarymanagementsystem.service.TransactionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/books")
@@ -14,8 +17,11 @@ public class BookController {
 
     private final BookService bookService;
 
-    public BookController(BookService bookService) {
+    private final TransactionService transactionService;
+
+    public BookController(BookService bookService, TransactionService transactionService) {
         this.bookService = bookService;
+        this.transactionService = transactionService;
     }
 
     @GetMapping
@@ -106,4 +112,30 @@ public class BookController {
 
         return "redirect:/books";
     }
+
+    // borrow book
+    @PostMapping("/{id}/borrow")
+    public String borrowBook(@PathVariable Long id, Authentication authentication) {
+
+        String username = authentication.getName();
+
+        transactionService.borrowBook(id, username);
+
+        return "redirect:/books";
+    }
+
+    // return
+    @PostMapping("/{id}/return")
+    public String returnBook(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+
+        try {
+            transactionService.returnBook(id);
+            redirectAttributes.addFlashAttribute("success", "Book returned successfully");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Unable to return book");
+        }
+
+        return "redirect:/books";
+    }
+
 }

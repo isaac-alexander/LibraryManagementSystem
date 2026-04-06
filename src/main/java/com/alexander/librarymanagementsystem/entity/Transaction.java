@@ -1,7 +1,6 @@
 package com.alexander.librarymanagementsystem.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 
 @Entity
@@ -11,25 +10,31 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // many transactions - one user
     @ManyToOne
     private User user;
 
+    // many transactions - one book
     @ManyToOne
     private Book book;
 
     private LocalDate borrowDate;
+
     private LocalDate returnDate;
+
+    // tells if book is still borrowed
+    private boolean returned;
 
     public Transaction() {
     }
 
-    public Transaction(Long id, User user, Book book, LocalDate borrowDate, LocalDate returnDate) {
-        this.id = id;
+    public Transaction(User user, Book book, LocalDate borrowDate, boolean returned) {
         this.user = user;
         this.book = book;
         this.borrowDate = borrowDate;
-        this.returnDate = returnDate;
+        this.returned = returned;
     }
+
 
     public Long getId() {
         return id;
@@ -65,5 +70,13 @@ public class Transaction {
 
     public void setReturnDate(LocalDate returnDate) {
         this.returnDate = returnDate;
+    }
+
+    public boolean isReturned() {
+        return returned;
+    }
+
+    public void setReturned(boolean returned) {
+        this.returned = returned;
     }
 }
