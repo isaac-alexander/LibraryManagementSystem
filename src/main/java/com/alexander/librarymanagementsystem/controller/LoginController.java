@@ -3,6 +3,7 @@ package com.alexander.librarymanagementsystem.controller;
 import com.alexander.librarymanagementsystem.entity.User;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 // handles login page
@@ -14,13 +15,16 @@ public class LoginController {
         return "redirect:/login";
     }
     @GetMapping("/login")
-    public String loginPage(HttpSession session) {
-        User user = (User) session.getAttribute("loggedInUser");
-        if (user == null) {
-            return "login";
-        } else {
-            return "redirect:/books";
+    public String loginPage(HttpSession session, Model model) {
+
+        Object error = session.getAttribute("loginError");
+
+        if (error != null) {
+            model.addAttribute("loginError", error);
+            session.removeAttribute("loginError");
         }
 
+        return "login";
     }
+
 }

@@ -1,6 +1,7 @@
 package com.alexander.librarymanagementsystem.controller;
 
 import com.alexander.librarymanagementsystem.entity.Book;
+import com.alexander.librarymanagementsystem.entity.Transaction;
 import com.alexander.librarymanagementsystem.service.BookService;
 import com.alexander.librarymanagementsystem.service.TransactionService;
 import org.springframework.stereotype.Controller;
@@ -11,12 +12,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequestMapping("/books")
 public class BookController {
 
     private final BookService bookService;
-
     private final TransactionService transactionService;
 
     public BookController(BookService bookService, TransactionService transactionService) {
@@ -24,13 +27,35 @@ public class BookController {
         this.transactionService = transactionService;
     }
 
+    // show all books
     @GetMapping
-    public String listBooks(Model model) {
+    public String listBooks(Model model, Authentication authentication) {
+
         model.addAttribute("books", bookService.getAllBooks());
+
+        // get logged-in username
+        String username = authentication.getName();
+
+        // get user transactions
+        List<Transaction> transactions = transactionService.getUserTransactions(username);
+
+        // store book ids user borrowed
+        List<Long> myBookIds = new ArrayList<>();
+
+        for (Transaction t : transactions) {
+
+            // only active borrowed books
+            if (!t.isReturned()) {
+                myBookIds.add(t.getBook().getId());
+            }
+        }
+
+        model.addAttribute("myBookIds", myBookIds);
+
         return "books";
     }
 
-    // CREATE FORM
+    // create form
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("book", new Book());
@@ -39,7 +64,7 @@ public class BookController {
         return "book-form";
     }
 
-    // CREATE
+    // save book
     @PostMapping
     public String saveBook(@Valid @ModelAttribute Book book,
                            BindingResult result,
@@ -51,11 +76,14 @@ public class BookController {
             return "book-form";
         }
 
+        // ensure book is available when created
+        book.setAvailable(true);
+
         bookService.saveBook(book);
         return "redirect:/books";
     }
 
-    // EDIT FORM
+    // edit form
     @GetMapping("/{id}/edit")
     public String editBook(@PathVariable Long id, Model model) {
 
@@ -68,7 +96,7 @@ public class BookController {
         return "book-form";
     }
 
-    //  UPDATE
+    // update
     @PutMapping("/{id}")
     public String updateBook(@PathVariable Long id,
                              @Valid @ModelAttribute Book book,
@@ -83,18 +111,18 @@ public class BookController {
 
         book.setId(id);
         bookService.saveBook(book);
+
         return "redirect:/books";
     }
 
-    //  DELETE
+    // delete
     @DeleteMapping("/{id}")
     public String deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
         return "redirect:/books";
     }
 
-    // SEARCH books
-    // GET /books/search?keyword=java
+    // search
     @GetMapping("/search")
     public String searchBooks(@RequestParam("keyword") String keyword, Model model) {
 
@@ -102,15 +130,6 @@ public class BookController {
         model.addAttribute("keyword", keyword);
 
         return "books";
-    }
-
-    // Toggle book availability true or false. borrow or return
-    @PostMapping("/{id}/toggle")
-    public String toggleAvailability(@PathVariable Long id) {
-
-        bookService.toggleAvailability(id);
-
-        return "redirect:/books";
     }
 
     // borrow book
@@ -124,18 +143,21 @@ public class BookController {
         return "redirect:/books";
     }
 
-    // return
+    // return book
     @PostMapping("/{id}/return")
-    public String returnBook(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String returnBook(@PathVariable Long id,
+                             Authentication authentication,
+                             RedirectAttributes redirectAttributes) {
+
+        String username = authentication.getName();
 
         try {
-            transactionService.returnBook(id);
-            redirectAttributes.addFlashAttribute("success", "Book returned successfully");
+            transactionService.returnBook(id, username);
+            redirectAttributes.addFlashAttribute("success", "book returned successfully");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Unable to return book");
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
 
         return "redirect:/books";
     }
-
 }

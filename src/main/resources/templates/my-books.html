@@ -14,15 +14,19 @@
 
 <div class="container mt-4">
 
-    <h3 class="mb-3 text-center">Borrowed Books</h3>
+    <h3 class="mb-4 text-center">Borrowed Books</h3>
 
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped text-center">
 
         <thead class="table-dark">
         <tr>
             <th>Book Title</th>
-            <th>User</th>
+
+            <!-- show user column only for admin -->
+            <th sec:authorize="hasRole('ADMIN')">User</th>
+
             <th>Borrow Date</th>
+            <th>Due Date</th>
             <th>Return Date</th>
             <th>Status</th>
         </tr>
@@ -31,18 +35,30 @@
         <tbody>
         <tr th:each="t : ${transactions}">
 
+            <!-- book title -->
             <td th:text="${t.book.title}"></td>
 
-            <!-- show username for  admin -->
-            <td th:text="${t.user.username}"></td>
+            <!-- username admin only -->
+            <td sec:authorize="hasRole('ADMIN')"
+                th:text="${t.user.username}"></td>
 
+            <!-- borrow date -->
             <td th:text="${t.borrowDate}"></td>
+
+            <!-- show due date -->
+            <td th:text="${t.dueDate}"></td>
 
             <td th:text="${t.returnDate != null ? t.returnDate : 'Not returned'}"></td>
 
             <td th:text="${t.returned ? 'Returned' : 'Borrowed'}"></td>
 
         </tr>
+
+        <!-- show message if no data -->
+        <tr th:if="${#lists.isEmpty(transactions)}">
+            <td colspan="5">No records found</td>
+        </tr>
+
         </tbody>
 
     </table>

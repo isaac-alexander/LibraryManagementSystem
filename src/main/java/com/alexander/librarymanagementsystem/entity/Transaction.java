@@ -22,6 +22,9 @@ public class Transaction {
 
     private LocalDate returnDate;
 
+    // due date for returning book
+    private LocalDate dueDate;
+
     // tells if book is still borrowed
     private boolean returned;
 
@@ -34,7 +37,6 @@ public class Transaction {
         this.borrowDate = borrowDate;
         this.returned = returned;
     }
-
 
     public Long getId() {
         return id;
@@ -70,6 +72,14 @@ public class Transaction {
 
     public void setReturnDate(LocalDate returnDate) {
         this.returnDate = returnDate;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
     }
 
     public boolean isReturned() {

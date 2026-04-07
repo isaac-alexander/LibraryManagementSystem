@@ -8,3 +8,7 @@ Updated pom.xml with new dependency that helps with security
 added tag to <html>
 xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
 
+To use or share 1 navbar across all html files
+1. create a folder in the templates folder
+2. create navbar.hml file
+3. add <div th:fragment="navbar"></div> at the top of the file after the <body> tag

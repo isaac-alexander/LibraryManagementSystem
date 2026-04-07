@@ -6,9 +6,11 @@ import java.util.List;
 
 public interface TransactionService {
 
+    // borrow book
     void borrowBook(Long bookId, String username);
 
-    void returnBook(Long bookId);
+    // return book (with user check)
+    void returnBook(Long bookId, String username);
 
     // get books borrowed by a specific user
     List<Transaction> getUserTransactions(String username);

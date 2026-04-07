@@ -35,7 +35,10 @@ public class SecurityConfig {
                 .formLogin(login -> login
                         .loginPage("/login")
                         .defaultSuccessUrl("/books", true)
-                        .failureUrl("/login")
+                        .failureHandler((request, response, exception) -> {
+                            request.getSession().setAttribute("loginError", "Invalid username or password");
+                            response.sendRedirect("/login");
+                        })
                         .permitAll()
                 )
 

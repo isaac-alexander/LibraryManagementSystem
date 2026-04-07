@@ -46,7 +46,14 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = new Transaction();
         transaction.setBook(book);
         transaction.setUser(user);
-        transaction.setBorrowDate(LocalDate.now());
+
+        // set borrow date
+        LocalDate today = LocalDate.now();
+        transaction.setBorrowDate(today);
+
+        // set due date (7 days after borrow)
+        transaction.setDueDate(today.plusDays(7));
+
         transaction.setReturned(false);
 
         // save transaction
@@ -56,10 +63,9 @@ public class TransactionServiceImpl implements TransactionService {
         book.setAvailable(false);
         bookRepository.save(book);
     }
-
-    // return book
+    // return book with ownership check
     @Override
-    public void returnBook(Long bookId) {
+    public void returnBook(Long bookId, String username) {
 
         // get book
         Book book = bookRepository.findById(bookId).orElseThrow();
@@ -68,9 +74,21 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = transactionRepository
                 .findByBookAndReturnedFalse(book);
 
-        // if no active transaction → just ignore (no crash)
+        // if no transaction → do nothing
         if (transaction == null) {
             return;
+        }
+
+        // check if this user is the owner
+        boolean isOwner = transaction.getUser().getUsername().equals(username);
+
+        // check if admin
+        User user = userRepository.findByUsername(username);
+        boolean isAdmin = user.getRole().equals("ADMIN");
+
+        // only owner or admin can return
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("you cannot return this book");
         }
 
         // update transaction
@@ -79,12 +97,12 @@ public class TransactionServiceImpl implements TransactionService {
 
         transactionRepository.save(transaction);
 
-        // mark book available again
+        // mark book available
         book.setAvailable(true);
         bookRepository.save(book);
     }
 
-    // get logged-in user books
+    // get user transactions
     @Override
     public List<Transaction> getUserTransactions(String username) {
 
