@@ -15,4 +15,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     // find all transactions for a user
     List<Transaction> findByUser(User user);
 
+    // check if a book is already borrowed
+    boolean existsByBookAndReturnedFalse(Book book);
+
 }

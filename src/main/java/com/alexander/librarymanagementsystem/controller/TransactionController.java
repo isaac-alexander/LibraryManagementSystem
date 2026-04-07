@@ -1,10 +1,14 @@
 package com.alexander.librarymanagementsystem.controller;
 
+import com.alexander.librarymanagementsystem.entity.Transaction;
 import com.alexander.librarymanagementsystem.service.TransactionService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Controller
 public class TransactionController {
@@ -22,18 +26,28 @@ public class TransactionController {
 
         String username = authentication.getName();
 
-        // check if logged-in user is admin
         boolean isAdmin = authentication.getAuthorities()
                 .stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
+        List<Transaction> transactions;
         if (isAdmin) {
-            // admin sees all transactions
-            model.addAttribute("transactions", transactionService.getAllTransactions());
+            transactions = transactionService.getAllTransactions();
         } else {
-            // student sees only their own borrowed books
-            model.addAttribute("transactions", transactionService.getUserTransactions(username));
+            transactions = transactionService.getUserTransactions(username);
         }
+
+        // beginner-friendly overdue check
+        boolean hasOverdue = false;
+        for (Transaction t : transactions) { // loop to check overdue
+            if (!t.isReturned() && t.getDueDate().isBefore(LocalDateTime.now())) {
+                hasOverdue = true;
+                break;
+            }
+        }
+
+        model.addAttribute("transactions", transactions);
+        model.addAttribute("hasOverdue", hasOverdue); // has overdue send to html
 
         return "my-books"; // thymeleaf page
     }

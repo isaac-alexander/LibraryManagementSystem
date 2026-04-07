@@ -9,7 +9,7 @@ import com.alexander.librarymanagementsystem.repository.UserRepository;
 import com.alexander.librarymanagementsystem.service.TransactionService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,29 +31,28 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void borrowBook(Long bookId, String username) {
 
-        // get book from db
+        // get user
+        User user = userRepository.findByUsername(username);
+
+        // get book
         Book book = bookRepository.findById(bookId).orElseThrow();
 
-        // check if book is already borrowed
+        // check if book is available
         if (!book.isAvailable()) {
             throw new RuntimeException("book already borrowed");
         }
 
-        // get logged-in user
-        User user = userRepository.findByUsername(username);
-
-        // create new transaction
+        // create transaction
         Transaction transaction = new Transaction();
         transaction.setBook(book);
         transaction.setUser(user);
 
-        // set borrow date
-        LocalDate today = LocalDate.now();
-        transaction.setBorrowDate(today);
+        // store borrow date + time
+        LocalDateTime now = LocalDateTime.now();
+        transaction.setBorrowDate(now);
 
-        // set due date (7 days after borrow)
-        transaction.setDueDate(today.plusDays(7));
-
+        // due date (7 days)
+        transaction.setDueDate(now.plusMinutes(5));
         transaction.setReturned(false);
 
         // save transaction
@@ -63,20 +62,19 @@ public class TransactionServiceImpl implements TransactionService {
         book.setAvailable(false);
         bookRepository.save(book);
     }
-    // return book with ownership check
+
+    // return book
     @Override
     public void returnBook(Long bookId, String username) {
 
         // get book
         Book book = bookRepository.findById(bookId).orElseThrow();
 
-        // find active transaction
-        Transaction transaction = transactionRepository
-                .findByBookAndReturnedFalse(book);
+        Transaction transaction = transactionRepository.findByBookAndReturnedFalse(book);
 
         // if no transaction → do nothing
         if (transaction == null) {
-            return;
+            throw new RuntimeException("No active transaction for this book");
         }
 
         // check if this user is the owner
@@ -93,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         // update transaction
         transaction.setReturned(true);
-        transaction.setReturnDate(LocalDate.now());
+        transaction.setReturnDate(LocalDateTime.now());
 
         transactionRepository.save(transaction);
 
@@ -116,7 +114,6 @@ public class TransactionServiceImpl implements TransactionService {
     // admin gets all transactions
     @Override
     public List<Transaction> getAllTransactions() {
-
         return transactionRepository.findAll();
     }
 }

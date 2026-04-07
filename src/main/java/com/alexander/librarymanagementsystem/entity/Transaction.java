@@ -1,7 +1,7 @@
 package com.alexander.librarymanagementsystem.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class Transaction {
@@ -10,32 +10,22 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // many transactions - one user
     @ManyToOne
     private User user;
 
-    // many transactions - one book
     @ManyToOne
     private Book book;
 
-    private LocalDate borrowDate;
+    // changed to include time
+    private LocalDateTime borrowDate;
 
-    private LocalDate returnDate;
+    private LocalDateTime returnDate;
 
-    // due date for returning book
-    private LocalDate dueDate;
+    private LocalDateTime dueDate;
 
-    // tells if book is still borrowed
     private boolean returned;
 
     public Transaction() {
-    }
-
-    public Transaction(User user, Book book, LocalDate borrowDate, boolean returned) {
-        this.user = user;
-        this.book = book;
-        this.borrowDate = borrowDate;
-        this.returned = returned;
     }
 
     public Long getId() {
@@ -58,27 +48,27 @@ public class Transaction {
         this.book = book;
     }
 
-    public LocalDate getBorrowDate() {
+    public LocalDateTime getBorrowDate() {
         return borrowDate;
     }
 
-    public void setBorrowDate(LocalDate borrowDate) {
+    public void setBorrowDate(LocalDateTime borrowDate) {
         this.borrowDate = borrowDate;
     }
 
-    public LocalDate getReturnDate() {
+    public LocalDateTime getReturnDate() {
         return returnDate;
     }
 
-    public void setReturnDate(LocalDate returnDate) {
+    public void setReturnDate(LocalDateTime returnDate) {
         this.returnDate = returnDate;
     }
 
-    public LocalDate getDueDate() {
+    public LocalDateTime getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(LocalDate dueDate) {
+    public void setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
     }
 
