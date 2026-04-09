@@ -61,9 +61,7 @@
 
             <!-- return button only for owner or admin -->
             <td>
-                <form th:if="${!t.returned}"
-                      th:action="@{'/books/' + ${t.book.id} + '/return'}"
-                      method="post">
+                <form th:if="${!t.returned}" th:action="@{'/books/' + ${t.book.id} + '/return'}" method="post">
 
                     <button type="submit" class="btn btn-outline-dark w-100"
                             th:disabled="${!#authentication.name.equals(t.user.username) and !#authorization.expression('hasRole(''ADMIN'')')}">

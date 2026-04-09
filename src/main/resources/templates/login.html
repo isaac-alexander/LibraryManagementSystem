@@ -18,18 +18,13 @@
     </div>
 
     <!-- logout success -->
-    <div th:if="${param.logout}" class="alert alert-success text-center">
-        logged out successfully
-    </div>
-
+    <div th:if="${param.logout}" class="alert alert-success text-center">logged out successfully </div>
 
     <form th:action="@{/login}" method="post">
 
-        <input type="text" name="username" placeholder="Username"
-               class="form-control mb-3" required/>
+        <input type="text" name="username" placeholder="Username" class="form-control mb-3" required/>
 
-        <input type="password" name="password" placeholder="Password"
-               class="form-control mb-3" required/>
+        <input type="password" name="password" placeholder="Password" class="form-control mb-3" required/>
 
         <button type="submit" class="btn btn-outline-dark w-100">Login</button>
 

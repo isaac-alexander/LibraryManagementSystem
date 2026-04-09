@@ -23,7 +23,10 @@ public class SecurityConfig {
                         .requestMatchers("/register").hasRole("ADMIN")
 
                         // ADMIN ONLY
-                        .requestMatchers("/books/**").hasRole("ADMIN")
+                        .requestMatchers("/books/new", "/books/*/edit", "/books/*/delete").hasRole("ADMIN")
+
+                        // ALL LOGGED-IN USERS
+                        .requestMatchers("/books/**").authenticated()
 
                         // PUBLIC
                         .anyRequest().permitAll()

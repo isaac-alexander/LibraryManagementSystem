@@ -4,7 +4,6 @@ import com.alexander.librarymanagementsystem.entity.Book;
 import com.alexander.librarymanagementsystem.entity.Transaction;
 import com.alexander.librarymanagementsystem.service.BookService;
 import com.alexander.librarymanagementsystem.service.TransactionService;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -95,7 +94,7 @@ public class BookController {
     public String updateBook(@PathVariable Long id, @Valid @ModelAttribute Book book, BindingResult result) {
 
         if (result.hasErrors()) {
-            return "redirect:/books/{id}/edit";
+            return "edit-book";
         }
 
         Book existingBook = bookService.getBookById(id);
@@ -106,7 +105,7 @@ public class BookController {
         existingBook.setYear(book.getYear());
         existingBook.setAvailable(true);
 
-        bookService.saveBook(book);
+        bookService.saveBook(existingBook);
 
         return "redirect:/books";
     }
@@ -120,16 +119,32 @@ public class BookController {
 
     // search
     @GetMapping("/search")
-    public String searchBooks(@RequestParam("keyword") String keyword, Model model) {
+    public String searchBooks(@RequestParam("keyword") String keyword,
+                              Model model,
+                              Authentication authentication) {
 
         List<Book> results = bookService.searchBooks(keyword);
 
         model.addAttribute("books", results);
         model.addAttribute("keyword", keyword);
 
+        String username = authentication.getName();
+
+        List<Transaction> transactions = transactionService.getUserTransactions(username);
+
+        List<Long> myBookIds = new ArrayList<>();
+
+        for (Transaction t : transactions) {
+            if (!t.isReturned()) {
+                myBookIds.add(t.getBook().getId());
+            }
+        }
+
+        model.addAttribute("myBookIds", myBookIds);
+
+        // messages
         if (keyword != null && !keyword.trim().isEmpty()) {
 
-            // added: search result message
             int count = results.size();
 
             if (count == 0) {
@@ -137,7 +152,6 @@ public class BookController {
             } else {
                 model.addAttribute("success", count + (count == 1 ? " book found" : " books found"));
             }
-
         }
 
         return "books";

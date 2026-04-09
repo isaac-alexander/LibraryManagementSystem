@@ -74,15 +74,9 @@
                     <a th:href="@{'/books/' + ${book.id} + '/edit'}"
                        class="btn btn-outline-dark btn-sm">Edit</a>
 
-                    <form th:action="@{'/books/' + ${book.id}}"
-                          method="post"
-                          style="display:inline;">
-                        <input type="hidden"
-                               name="_method"
-                               value="delete"/>
-                        <button type="submit"
-                                class="btn btn-outline-dark btn-sm">Delete
-                        </button>
+                    <form th:action="@{'/books/' + ${book.id}}" method="post" style="display:inline;">
+                        <input type="hidden" name="_method" value="delete"/>
+                        <button type="submit" class="btn btn-outline-dark btn-sm">Delete</button>
                     </form>
 
                 </div>
