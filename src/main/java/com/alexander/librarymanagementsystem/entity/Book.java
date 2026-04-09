@@ -1,6 +1,7 @@
 package com.alexander.librarymanagementsystem.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Min;
@@ -26,6 +27,7 @@ public class Book {
 
     @NotNull(message = "Year is required")
     @Min(value = 1000, message = "Year must be valid")
+    @Max(value = 2026, message = "Year must be valid")
     @Column(nullable = false)
     private int year;
 

@@ -7,98 +7,119 @@
           rel="stylesheet">
 </head>
 
-<body class="container mt-4">
+<body>
 
 <div th:replace="fragments/navbar :: navbar"></div>
 
-<!-- search -->
-<form th:action="@{/books/search}" method="get" class="mb-3 d-flex">
-    <input type="text" name="keyword" th:value="${keyword}"
-           placeholder="Search by title or author"
-           class="form-control me-2"/>
+<div class="container mt-4">
+    <!-- search -->
+    <form th:action="@{/books/search}"
+          method="get"
+          class="mb-3 d-flex">
+        <input type="text"
+               name="keyword"
+               th:value="${keyword}"
+               placeholder="Search by title or author"
+               class="form-control me-2"/>
 
-    <button type="submit" class="btn btn-outline-dark">Search</button>
-</form>
+        <button type="submit"
+                class="btn btn-outline-dark">Search
+        </button>
+    </form>
 
-<!-- admin add books-->
-<div sec:authorize="hasRole('ADMIN')">
-    <a th:href="@{/books/new}" class="btn btn-outline-dark mb-3">Add Book</a>
-</div>
+    <!-- admin add books-->
+    <div sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/books/new}"
+           class="btn btn-outline-dark mb-3">Add Book</a>
+    </div>
 
-<!-- messages -->
-<div th:if="${success}" class="alert alert-success text-center">
-    <span th:text="${success}"></span>
-</div>
+    <!-- messages -->
+    <div th:if="${success}"
+         class="alert alert-success text-center">
+        <span th:text="${success}"></span>
+    </div>
 
-<div th:if="${error}" class="alert alert-danger text-center">
-    <span th:text="${error}"></span>
-</div>
+    <div th:if="${error}"
+         class="alert alert-danger text-center">
+        <span th:text="${error}"></span>
+    </div>
 
-<table class="table table-striped table-bordered">
-    <thead class="table-dark">
-    <tr>
-        <th>Title</th>
-        <th>Author</th>
-        <th>ISBN</th>
-        <th>Year</th>
-        <th>Available</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>Year</th>
+            <th>Available</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
 
-    <tbody>
-    <tr th:each="book : ${books}">
+        <tbody>
+        <tr th:each="book : ${books}">
 
-        <td th:text="${book.title}"></td>
-        <td th:text="${book.author}"></td>
-        <td th:text="${book.isbn}"></td>
-        <td th:text="${book.year}"></td>
-        <td th:text="${book.available}"></td>
+            <td th:text="${book.title}"></td>
+            <td th:text="${book.author}"></td>
+            <td th:text="${book.isbn}"></td>
+            <td th:text="${book.year}"></td>
+            <td th:text="${book.available}"></td>
 
-        <td>
+            <td>
 
-            <!-- admin controls -->
-            <div sec:authorize="hasRole('ADMIN')" style="display:inline;">
+                <!-- admin controls -->
+                <div sec:authorize="hasRole('ADMIN')"
+                     style="display:inline;">
 
-                <a th:href="@{'/books/' + ${book.id} + '/edit'}"
-                   class="btn btn-outline-dark btn-sm">Edit</a>
+                    <a th:href="@{'/books/' + ${book.id} + '/edit'}"
+                       class="btn btn-outline-dark btn-sm">Edit</a>
 
-                <form th:action="@{'/books/' + ${book.id}}" method="post" style="display:inline;">
-                    <input type="hidden" name="_method" value="delete"/>
-                    <button type="submit" class="btn btn-outline-dark btn-sm">Delete</button>
+                    <form th:action="@{'/books/' + ${book.id}}"
+                          method="post"
+                          style="display:inline;">
+                        <input type="hidden"
+                               name="_method"
+                               value="delete"/>
+                        <button type="submit"
+                                class="btn btn-outline-dark btn-sm">Delete
+                        </button>
+                    </form>
+
+                </div>
+
+                <!-- borrow -->
+                <form th:if="${book.available}"
+                      th:action="@{'/books/' + ${book.id} + '/borrow'}"
+                      method="post"
+                      style="display:inline;">
+                    <button type="submit"
+                            class="btn btn-outline-dark btn-sm">
+                        Borrow
+                    </button>
                 </form>
 
-            </div>
+                <!-- RETURN -->
+                <form th:if="${!book.available && (myBookIds.contains(book.id) || #authorization.expression('hasRole(''ADMIN'')'))}"
+                      th:action="@{'/books/' + ${book.id} + '/return'}"
+                      method="post"
+                      style="display:inline;">
+                    <button type="submit"
+                            class="btn btn-outline-dark btn-sm">
+                        Return
+                    </button>
+                </form>
 
-            <!-- borrow -->
-            <form th:if="${book.available}"
-                  th:action="@{'/books/' + ${book.id} + '/borrow'}"
-                  method="post" style="display:inline;">
-                <button type="submit" class="btn btn-outline-dark btn-sm">
-                    Borrow
-                </button>
-            </form>
-
-            <!-- RETURN -->
-            <form th:if="${!book.available and (myBookIds.contains(book.id) or #authorization.expression('hasRole(''ADMIN'')'))}"
-                  th:action="@{'/books/' + ${book.id} + '/return'}"
-                  method="post" style="display:inline;">
-                <button type="submit" class="btn btn-outline-dark btn-sm">
-                    Return
-                </button>
-            </form>
-
-            <!-- not available -->
-            <span th:if="${!book.available and !myBookIds.contains(book.id) and !#authorization.expression('hasRole(''ADMIN'')')}"
-                  class="text-muted">
+                <!-- not available -->
+                <span th:if="${!book.available && !myBookIds.contains(book.id) && !#authorization.expression('hasRole(''ADMIN'')')}"
+                      class="text-muted">
                 Not Available
             </span>
 
-        </td>
+            </td>
 
-    </tr>
-    </tbody>
-</table>
-
+        </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

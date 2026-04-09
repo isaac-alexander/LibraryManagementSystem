@@ -52,7 +52,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setBorrowDate(now);
 
         // due date (7 days)
-        transaction.setDueDate(now.plusMinutes(5));
+        transaction.setDueDate(now.plusMinutes(1));
         transaction.setReturned(false);
 
         // save transaction

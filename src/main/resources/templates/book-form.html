@@ -6,13 +6,15 @@
           rel="stylesheet">
 </head>
 
-<body class="container mt-5">
+<body>
 
 <div th:replace="fragments/navbar :: navbar"></div>
 
+<div class="container mt-4">
+
 <h2 class="mb-4">Add Book</h2>
 
-<form th:action="@{${formAction}}" th:object="${book}" method="post">
+<form th:action="@{/books/new}" th:object="${book}" method="post">
 
     <input type="hidden" name="_method" th:if="${method == 'put'}" value="put"/>
     <input type="hidden" th:field="*{id}"/>
@@ -32,6 +34,6 @@
     <button type="submit" class="btn btn-outline-dark">Save</button>
 
 </form>
-
+</div>
 </body>
 </html>

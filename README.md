@@ -29,23 +29,52 @@ This is a **Library Management System**  that allows:
 - Navigate into the cloned folder:
 - cd <project-folder-name>
 - Open the project in your IDE  IntelliJ
-- Configure the database connection in application.properties (see Database Configuration)
+- Configure the database connection in application.yml
 
 ## Configure Database
 
 Update your application.yml file with your MySQL details:
-s
-pring:
-datasource:
-url: jdbc:mysql://localhost:3306/library_db
-username: root
-password: your_password
+## application.yml
+```
+spring:
+  application:
+    name: library-management-system
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/library_db?&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
+    username: your_username
+    password: your_password
 
-jpa:
-hibernate:
-ddl-auto: update
-show-sql: true
-## full application.yml setup below
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+        ddl-auto: update
+
+  mvc:
+    hiddenmethod:
+        filter:
+            enabled: true
+
+server:
+  error:
+    whitelabel:
+        enabled: false
+  port: 9090
+
+logging:
+    level:
+        org:
+            hibernate:
+                SQL: DEBUG
+
+
+```
+
+## In your sql workbench run
+`
+create database library_db
+`
+
 
 ## Run the Application from the main class
 
@@ -78,36 +107,3 @@ User        student         12345
 	•	Books are borrowed for 5 minutes (for testing)
 	•	After due time passes → marked as OVERDUE
 	•	System shows warning for overdue books
-
-- application.yml
-  spring:
-  application:
-  name: library-management-system
-
-  datasource:
-  url: jdbc:mysql://localhost:3306/library_db?&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
-  username: your_username
-  password: your_password
-
-
-jpa:
-database-platform: org.hibernate.dialect.MySQLDialect
-hibernate:
-ddl-auto: update
-
-mvc:
-hiddenmethod:
-filter:
-enabled: true
-
-server:
-error:
-whitelabel:
-enabled: false
-port: 9090
-
-logging:
-level:
-org:
-hibernate:
-SQL: DEBUG

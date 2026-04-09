@@ -4,6 +4,7 @@ import com.alexander.librarymanagementsystem.entity.Book;
 import com.alexander.librarymanagementsystem.entity.Transaction;
 import com.alexander.librarymanagementsystem.service.BookService;
 import com.alexander.librarymanagementsystem.service.TransactionService;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,6 @@ public class BookController {
         List<Long> myBookIds = new ArrayList<>();
 
         for (Transaction t : transactions) {
-
             // only active borrowed books
             if (!t.isReturned()) {
                 myBookIds.add(t.getBook().getId());
@@ -59,20 +59,16 @@ public class BookController {
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("book", new Book());
-        model.addAttribute("formAction", "/books");
-        model.addAttribute("method", "post");
         return "book-form";
     }
 
     // save book
-    @PostMapping
+    @PostMapping("/new")
     public String saveBook(@Valid @ModelAttribute Book book,
                            BindingResult result,
                            Model model) {
 
         if (result.hasErrors()) {
-            model.addAttribute("formAction", "/books");
-            model.addAttribute("method", "post");
             return "book-form";
         }
 
@@ -90,26 +86,26 @@ public class BookController {
         Book book = bookService.getBookById(id);
 
         model.addAttribute("book", book);
-        model.addAttribute("formAction", "/books/" + id);
-        model.addAttribute("method", "put");
 
-        return "book-form";
+        return "edit-book";
     }
 
     // update
-    @PutMapping("/{id}")
-    public String updateBook(@PathVariable Long id,
-                             @Valid @ModelAttribute Book book,
-                             BindingResult result,
-                             Model model) {
+    @PutMapping("/{id}/edit")
+    public String updateBook(@PathVariable Long id, @Valid @ModelAttribute Book book, BindingResult result) {
 
         if (result.hasErrors()) {
-            model.addAttribute("formAction", "/books/" + id);
-            model.addAttribute("method", "put");
-            return "book-form";
+            return "redirect:/books/{id}/edit";
         }
 
-        book.setId(id);
+        Book existingBook = bookService.getBookById(id);
+
+        existingBook.setTitle(book.getTitle());
+        existingBook.setAuthor(book.getAuthor());
+        existingBook.setIsbn(book.getIsbn());
+        existingBook.setYear(book.getYear());
+        existingBook.setAvailable(true);
+
         bookService.saveBook(book);
 
         return "redirect:/books";
@@ -126,19 +122,39 @@ public class BookController {
     @GetMapping("/search")
     public String searchBooks(@RequestParam("keyword") String keyword, Model model) {
 
-        model.addAttribute("books", bookService.searchBooks(keyword));
+        List<Book> results = bookService.searchBooks(keyword);
+
+        model.addAttribute("books", results);
         model.addAttribute("keyword", keyword);
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+
+            // added: search result message
+            int count = results.size();
+
+            if (count == 0) {
+                model.addAttribute("error", "no books found");
+            } else {
+                model.addAttribute("success", count + (count == 1 ? " book found" : " books found"));
+            }
+
+        }
 
         return "books";
     }
 
     // borrow book
     @PostMapping("/{id}/borrow")
-    public String borrowBook(@PathVariable Long id, Authentication authentication) {
+    public String borrowBook(@PathVariable Long id,
+                             Authentication authentication,
+                             RedirectAttributes redirectAttributes) {
 
         String username = authentication.getName();
 
         transactionService.borrowBook(id, username);
+
+        // added success message
+        redirectAttributes.addFlashAttribute("success", "book borrowed, go to my books");
 
         return "redirect:/books";
     }
