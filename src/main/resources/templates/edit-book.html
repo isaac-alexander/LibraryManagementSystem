@@ -27,7 +27,7 @@
         <input type="text" th:field="*{isbn}" placeholder="ISBN" class="form-control mb-2"required/>
         <div class="text-danger mb-2" th:if="${#fields.hasErrors('isbn')}" th:errors="*{isbn}"></div>
 
-        <input type="number" th:field="*{year}" placeholder="Year" class="form-control mb-3"required/>
+        <input type="date" th:field="*{year}" th:attr="max=${today}" placeholder="Year" class="form-control mb-3"/>
         <div class="text-danger mb-3" th:if="${#fields.hasErrors('year')}" th:errors="*{year}"></div>
 
         <button type="submit" class="btn btn-outline-dark">Save</button>

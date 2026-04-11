@@ -10,6 +10,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
+
 @SpringBootApplication
 public class LibraryManagementSystemApplication implements CommandLineRunner {
 
@@ -30,7 +32,7 @@ public class LibraryManagementSystemApplication implements CommandLineRunner {
     public void run(String... args) {
 
         // create new book for test
-        Book book = new Book("PSYCHODRAMA", "DAVE","12345", 2019, true);
+        Book book = new Book("PSYCHODRAMA", "DAVE","12345", LocalDate.of(2019, 1, 1), true);
         bookRepository.save(book);
 
         // ADMIN

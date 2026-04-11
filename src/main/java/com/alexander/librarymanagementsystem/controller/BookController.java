@@ -58,6 +58,7 @@ public class BookController {
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("book", new Book());
+        model.addAttribute("today", java.time.LocalDate.now());
         return "book-form";
     }
 
@@ -70,6 +71,11 @@ public class BookController {
         if (result.hasErrors()) {
             return "book-form";
         }
+        //year
+        book.setYear(java.time.LocalDate.of(book.getYear().getYear(), 1, 1));
+
+        // ensure book is available when created
+        book.setAvailable(true);
 
         // ensure book is available when created
         book.setAvailable(true);
@@ -85,6 +91,7 @@ public class BookController {
         Book book = bookService.getBookById(id);
 
         model.addAttribute("book", book);
+        model.addAttribute("today", java.time.LocalDate.now());
 
         return "edit-book";
     }
@@ -102,7 +109,7 @@ public class BookController {
         existingBook.setTitle(book.getTitle());
         existingBook.setAuthor(book.getAuthor());
         existingBook.setIsbn(book.getIsbn());
-        existingBook.setYear(book.getYear());
+        existingBook.setYear(java.time.LocalDate.of(book.getYear().getYear(), 1, 1));
         existingBook.setAvailable(true);
 
         bookService.saveBook(existingBook);

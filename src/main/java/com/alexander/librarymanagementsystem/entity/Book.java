@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Min;
 
+import java.time.LocalDate;
+
 @Entity
 public class Book {
 
@@ -26,17 +28,14 @@ public class Book {
     private String isbn;
 
     @NotNull(message = "Year is required")
-    @Min(value = 1000, message = "Year must be valid")
-    @Max(value = 2026, message = "Year must be valid")
-    @Column(nullable = false)
-    private int year;
+    private LocalDate year;
 
     private boolean available;
 
     public Book() {
     }
 
-    public Book(String title, String author, String isbn, int year, boolean available) {
+    public Book(String title, String author, String isbn, LocalDate year, boolean available) {
         this.title = title;
         this.author = author;
         this.isbn = isbn;
@@ -76,11 +75,11 @@ public class Book {
         this.isbn = isbn;
     }
 
-    public int getYear() {
+    public LocalDate getYear() {
         return year;
     }
 
-    public void setYear(int year) {
+    public void setYear(LocalDate year) {
         this.year = year;
     }
 
