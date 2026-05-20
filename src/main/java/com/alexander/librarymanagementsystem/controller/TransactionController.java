@@ -3,7 +3,6 @@ package com.alexander.librarymanagementsystem.controller;
 import com.alexander.librarymanagementsystem.entity.Transaction;
 import com.alexander.librarymanagementsystem.service.TransactionService;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,16 +30,27 @@ public class TransactionController {
         // get the username of the logged-in user
         String username = authentication.getName();
 
-        boolean isAdmin = false;
+//        boolean isAdmin = false;
 
-    // loop through all authorities
-        for (GrantedAuthority authority : authentication.getAuthorities()) {
-            if (authority.getAuthority().equals("ROLE_ADMIN")) {
-                isAdmin = true;
-                break; // stop once found
-            }
-        }
+        // loop through all authorities
+//        for (GrantedAuthority authority : authentication.getAuthorities()) {
+//            if (authority.getAuthority().equals("ROLE_ADMIN")) {
+//                isAdmin = true;
+//                break; // stop once found
+//            }
+//        }
 
+// convert the logged-in user's authorities/roles into a stream
+        boolean isAdmin = authentication.getAuthorities().stream()
+
+                // check if ANY authority matches the condition below
+                .anyMatch(authority ->
+
+                        // get the authority name and compare it with ROLE_ADMIN
+                        authority.getAuthority()
+
+                                // returns true if the user has admin role
+                                .equals("ROLE_ADMIN"));
 
         // if admin - get all transactions
         if (isAdmin) {
@@ -53,23 +63,35 @@ public class TransactionController {
         // get only the logged-in user's transactions for overdue check
         List<Transaction> userTransactions = transactionService.getUserTransactions(username);
 
-        // assume no overdue at the beginning
-        boolean hasOverdue = false;
+//        // assume no overdue at the beginning
+//        boolean hasOverdue = false;
+//
+//        // loop through user's transactions
+//        for (Transaction t : userTransactions) {
+//
+//            // check if book is not returned and due date has passed
+//            if (!t.isReturned() && t.getDueDate().isBefore(LocalDateTime.now())) {
+//
+//                // user has overdue
+//                hasOverdue = true;
+//
+//                // stops the loop
+//                break;
+//            }
+//        }
 
-        // loop through user's transactions
-        for (Transaction t : userTransactions) {
+// convert the user's transactions list into a stream
+        boolean hasOverdue = userTransactions.stream()
 
-            // check if book is not returned and due date has passed
-            if (!t.isReturned() && t.getDueDate().isBefore(LocalDateTime.now())) {
+                // check if ANY transaction matches the condition below
+                .anyMatch(transaction ->
 
-                // user has overdue
-                hasOverdue = true;
+                        // check if the book has NOT been returned
+                        !transaction.isReturned() &&
 
-                // stops the loop
-                break;
-            }
-        }
-
+                                // check if the due date is before the current date and time
+                                // meaning the book is overdue
+                                transaction.getDueDate().isBefore(LocalDateTime.now()));
         // send data to html
         model.addAttribute("transactions", transactions);
         model.addAttribute("hasOverdue", hasOverdue);

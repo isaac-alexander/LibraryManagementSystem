@@ -40,14 +40,18 @@ public class BookController {
         List<Transaction> transactions = transactionService.getUserTransactions(username);
 
         // store book ids user borrowed
-        List<Long> myBookIds = new ArrayList<>();
-
-        for (Transaction t : transactions) {
-            // only active borrowed books
-            if (!t.isReturned()) {
-                myBookIds.add(t.getBook().getId());
-            }
-        }
+//        List<Long> myBookIds = new ArrayList<>();
+//
+//        for (Transaction t : transactions) {
+//            // only active borrowed books
+//            if (!t.isReturned()) {
+//                myBookIds.add(t.getBook().getId());
+//            }
+//        }
+        List<Long> myBookIds = transactions.stream()
+                .filter(transaction -> !transaction.isReturned())
+                .map(transaction -> transaction.getBook().getId())
+                .toList();
 
         model.addAttribute("myBookIds", myBookIds);
 
@@ -139,13 +143,26 @@ public class BookController {
 
         List<Transaction> transactions = transactionService.getUserTransactions(username);
 
-        List<Long> myBookIds = new ArrayList<>();
+//        List<Long> myBookIds = new ArrayList<>();
+//
+//        for (Transaction t : transactions) {
+//            if (!t.isReturned()) {
+//                myBookIds.add(t.getBook().getId());
+//            }
+//        }
 
-        for (Transaction t : transactions) {
-            if (!t.isReturned()) {
-                myBookIds.add(t.getBook().getId());
-            }
-        }
+
+        // convert transactions list into a stream
+        List<Long> myBookIds = transactions.stream()
+
+                // keep only transactions where the book has not been returned
+                .filter(transaction -> !transaction.isReturned())
+
+                // convert each transaction into its book id
+                .map(transaction -> transaction.getBook().getId())
+
+                // convert the stream result back into a List
+                .toList();
 
         model.addAttribute("myBookIds", myBookIds);
 
