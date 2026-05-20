@@ -107,3 +107,18 @@ User        student         12345
 	•	Books are borrowed for 5 minutes (for testing)
 	•	After due time passes → marked as OVERDUE
 	•	System shows warning for overdue books
+
+## Login Page
+![image alt](https://github.com/isaac-alexander/LibraryManagementSystem/blob/5d79841fa97d00ad402b2b97118be65d28bbbfa8/LibraryLoginPage.png) 
+
+## All Books
+![image alt](https://github.com/isaac-alexander/LibraryManagementSystem/blob/5d79841fa97d00ad402b2b97118be65d28bbbfa8/LibraryAllBooks.png)
+
+## Add Book
+![image alt](https://github.com/isaac-alexander/LibraryManagementSystem/blob/5d79841fa97d00ad402b2b97118be65d28bbbfa8/LibraryAddBook.png) 
+
+## Register Student
+![image alt](https://github.com/isaac-alexander/LibraryManagementSystem/blob/5d79841fa97d00ad402b2b97118be65d28bbbfa8/LibraryRegisterStudent.png)
+
+## Borrowed Books
+![image alt](https://github.com/isaac-alexander/LibraryManagementSystem/blob/5d79841fa97d00ad402b2b97118be65d28bbbfa8/LibraryBorrowedBooks.png)
